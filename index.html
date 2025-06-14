@@ -19,11 +19,22 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #FDFBF5; /* Cream background */
-            background-image: url('https://placehold.co/1920x1080/F5F5DC/606060?text=Subtle+History+Texture'); /* Example background image, replace with a real one for production */
+            background-color: #FDFBF5; /* Cream background fallback */
+            background-image: url('https://images.unsplash.com/photo-1549608182-f54247e3a9b1?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Subtle old paper texture */
             background-size: cover;
             background-attachment: fixed;
             background-position: center;
+            position: relative; /* Needed for pseudo-element overlay */
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2); /* Dark overlay for readability */
+            z-index: -1; /* Ensure it's behind content but above background image */
         }
         .tab-active {
             border-color: #14B8A6; /* Teal accent */
@@ -88,7 +99,7 @@
             color: white;
             padding: 10px 15px;
             border-radius: 50%;
-            display: none; /* Hidden by default */
+            display: none;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: opacity 0.3s ease-in-out;
             cursor: pointer;
@@ -98,19 +109,42 @@
         /* Mobile specific adjustments */
         @media (max-width: 767px) {
             .tab-button {
-                flex-grow: 1; /* Allow tabs to take equal width */
-                font-size: 0.875rem; /* Smaller font on mobile */
-                padding: 0.75rem 0.5rem; /* Adjust padding */
+                flex-grow: 1;
+                font-size: 0.875rem;
+                padding: 0.75rem 0.5rem;
             }
             .main-content-area {
-                padding: 1rem; /* Reduce overall padding on mobile */
+                padding: 1rem;
             }
-            .text-3xl { /* Adjust header font sizes for mobile */
+            .text-3xl {
                 font-size: 2rem;
             }
             .text-lg {
                 font-size: 1rem;
             }
+            .header-text {
+                color: #fff; /* White text on header for better contrast with darker background */
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Add text shadow for readability */
+            }
+        }
+        /* Further styling for buttons and cards */
+        button {
+            border-radius: 0.5rem; /* Consistent rounded corners */
+        }
+        .rounded-lg, .rounded-xl {
+            border-radius: 0.75rem; /* Slightly more rounded for main elements */
+        }
+        .shadow-md {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .shadow-xl {
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+        }
+        .hover\:scale-105:hover {
+            transform: scale(1.02); /* Less aggressive hover for subtle classiness */
+        }
+        .fact-display {
+            min-height: 60px; /* Ensure space even if content is short */
         }
     </style>
 </head>
@@ -119,42 +153,132 @@
     <div class="container mx-auto p-4 md:p-8">
 
         <header class="text-center mb-8 md:mb-12">
-            <h1 class="text-3xl md:text-5xl font-bold text-slate-900 fade-in" id="mainTitle">The What If? Historian </h1>
-            <p class="mt-2 text-lg md:text-xl text-slate-600 fade-in" id="subTitle">Your Interactive Blueprint for a Faceless YouTube Empire  ~by ShuYaNee</p>
+            <h1 class="text-3xl md:text-5xl font-bold text-slate-900 fade-in header-text" id="mainTitle">The What If? Historian</h1>
+            <p class="mt-2 text-lg md:text-xl text-slate-600 fade-in header-text" id="subTitle">Your Interactive Blueprint for a Faceless YouTube Empire ~ by ShuYaNee</p>
             <button id="exploreButton" class="mt-8 bg-teal-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition transform hover:scale-105 shadow-lg">
                 Explore the Blueprint 👇
             </button>
         </header>
 
+        <!-- Dynamic Fact Display -->
+        <div id="factDisplay" class="bg-gray-800 text-white p-4 rounded-lg shadow-md mb-8 text-center text-md md:text-lg italic fact-display hidden">
+            <!-- Facts will be inserted here by JavaScript -->
+        </div>
+
         <div class="w-full max-w-5xl mx-auto bg-white p-6 rounded-xl shadow-xl main-content-area" id="mainContent">
             <div class="border-b border-gray-200 mb-8">
                 <nav class="-mb-px flex flex-wrap justify-center gap-4" aria-label="Tabs">
-                    <button class="tab-button shrink-0 border-b-2 font-medium px-3 py-3 text-sm text-gray-500 hover:border-gray-300 hover:text-gray-700 tab-active" data-tab="content">
-                        Phase 1: Content Creation
+                    <button class="tab-button shrink-0 border-b-2 font-medium px-3 py-3 text-sm text-gray-500 hover:border-gray-300 hover:text-gray-700 tab-active" data-tab="setup-branding">
+                        Phase 1: Setup & Branding
+                    </button>
+                    <button class="tab-button shrink-0 border-b-2 font-medium px-3 py-3 text-sm text-gray-500 hover:border-gray-300 hover:text-gray-700" data-tab="content-production">
+                        Phase 2: Content Production
                     </button>
                     <button class="tab-button shrink-0 border-b-2 font-medium px-3 py-3 text-sm text-gray-500 hover:border-gray-300 hover:text-gray-700" data-tab="monetization">
-                        Phase 2: Monetization
+                        Phase 3: Monetization
                     </button>
-                    <button class="tab-button shrink-0 border-b-2 font-medium px-3 py-3 text-sm text-gray-500 hover:border-gray-300 hover:text-gray-700" data-tab="growth">
-                        Phase 3: Growth & Legal
+                    <button class="tab-button shrink-0 border-b-2 font-medium px-3 py-3 text-sm text-gray-500 hover:border-gray-300 hover:text-gray-700" data-tab="growth-legal">
+                        Phase 4: Launch & Growth
                     </button>
                 </nav>
             </div>
 
             <main>
-                <!-- Content Creation Tab -->
-                <div id="content" class="tab-content space-y-6">
+                <!-- Phase 1: Setup & Branding Tab -->
+                <div id="setup-branding" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-lg shadow-sm">
-                        <h2 class="text-2xl font-bold mb-4 text-slate-900">Phase 1: Crafting Compelling Content with Free AI</h2>
-                        <p class="text-slate-600 mb-6">This phase outlines the core production workflow for your videos. The key is to leverage free AI tools efficiently, while ensuring your human creativity and oversight adds the unique value that YouTube's algorithm and audience reward. A purely automated process risks creating low-value content.</p>
+                        <h2 class="text-2xl font-bold mb-4 text-slate-900">Phase 1: Foundation & Setup (The First Hour)</h2>
+                        <p class="text-slate-600 mb-6">This is the groundwork. We'll create your brand and channel in less than an hour, preparing you for content creation.</p>
+                        <div class="space-y-4">
+                            <!-- Accordion Item 1.1: Create YouTube Channel -->
+                            <div class="accordion-item bg-slate-50 rounded-lg shadow-md">
+                                <h2>
+                                    <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-slate-700 hover:bg-slate-100 rounded-lg" data-target="#accordion-body-setup-1">
+                                        <span>Step 1.1: Create Your YouTube Channel</span>
+                                        <svg class="accordion-arrow w-6 h-6 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                </h2>
+                                <div id="accordion-body-setup-1" class="accordion-content">
+                                    <div class="p-5 border-t border-slate-200">
+                                        <p class="mb-2 text-slate-600">Go to <a href="https://www.youtube.com" target="_blank" class="text-teal-600 hover:underline">YouTube.com</a> and sign in with a Google account.</p>
+                                        <p class="mb-4 text-slate-600">Go to your settings and click "Create a new channel."</p>
+                                        <h4 class="font-semibold text-slate-800 mb-2">Channel Name Suggestion:</h4>
+                                        <p class="text-slate-600"><strong>The What If? Historian</strong> (or a similar variation like Alternate Archives, Echoes of What If).</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Accordion Item 1.2: Create Your Brand Identity with AI -->
+                            <div class="accordion-item bg-slate-50 rounded-lg shadow-md">
+                                <h2>
+                                    <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-slate-700 hover:bg-slate-100 rounded-lg" data-target="#accordion-body-setup-2">
+                                        <span>Step 1.2: Create Your Brand Identity with AI</span>
+                                        <svg class="accordion-arrow w-6 h-6 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                </h2>
+                                <div id="accordion-body-setup-2" class="accordion-content">
+                                    <div class="p-5 border-t border-slate-200">
+                                        <p class="mb-4 text-slate-600">We need a professional look. We'll use AI so you don't need any design skills. While the blueprint mentions Midjourney (a paid tool), you can use free alternatives like **Leonardo AI** or **Playground AI** (as detailed in Phase 2, Step 2.2 for visuals) with similar prompts.</p>
+                                        <h4 class="font-semibold text-slate-800 mb-2">Logo Creation (using AI Image Generator):</h4>
+                                        <p class="text-slate-600 mb-2">Use this prompt in your chosen free AI tool:</p>
+                                        <div class="bg-gray-100 p-3 rounded-md text-sm font-mono mb-4 border border-gray-200">
+                                            <code>minimalist logo for a history channel called 'The What If? Historian', an hourglass merging with a question mark, vector logo, on a black background --ar 1:1</code>
+                                        </div>
+                                        <p class="mb-4 text-slate-600">Download your favorite version.</p>
+
+                                        <h4 class="font-semibold text-slate-800 mb-2">Banner Creation (using AI Image Generator):</h4>
+                                        <p class="text-slate-600 mb-2">Use this prompt:</p>
+                                        <div class="bg-gray-100 p-3 rounded-md text-sm font-mono mb-4 border border-gray-200">
+                                            <code>YouTube channel banner, cinematic collage of historical scenes, roman legions, egyptian pyramids, and futuristic technology, dramatic lighting, epic, mysterious, include the text 'The What If? Historian' --ar 16:9</code>
+                                        </div>
+                                        <p class="mb-4 text-slate-600">Upload the logo and banner to your YouTube channel's "Branding" section.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Accordion Item 1.3: Write Your Channel Description -->
+                            <div class="accordion-item bg-slate-50 rounded-lg shadow-md">
+                                <h2>
+                                    <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-slate-700 hover:bg-slate-100 rounded-lg" data-target="#accordion-body-setup-3">
+                                        <span>Step 1.3: Write Your Channel Description</span>
+                                        <svg class="accordion-arrow w-6 h-6 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                </h2>
+                                <div id="accordion-body-setup-3" class="accordion-content">
+                                    <div class="p-5 border-t border-slate-200">
+                                        <p class="mb-4 text-slate-600">This tells viewers and the YouTube algorithm what you're about. Go to your channel's "About" section.</p>
+                                        <h4 class="font-semibold text-slate-800 mb-2">Copy-Paste This Description:</h4>
+                                        <div class="bg-gray-100 p-3 rounded-md text-sm font-mono mb-4 border border-gray-200 whitespace-pre-wrap">
+                                            Welcome to The What If? Historian.
+                                            
+                                            Have you ever wondered how one different decision could have changed the world forever? What if Rome never fell? What if the dinosaurs never went extinct?
+
+                                            We explore the most fascinating alternate timelines and paradoxes in history. We dive deep into the pivotal moments that shaped our world and reimagine them, revealing the shocking and incredible consequences.
+
+                                            Join us as we journey through the echoes of what could have been.
+
+                                            New videos every week.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 2: Content Production Tab -->
+                <div id="content-production" class="tab-content hidden space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h2 class="text-2xl font-bold mb-4 text-slate-900">Phase 2: The Content Factory (Your First Video)</h2>
+                        <p class="text-slate-600 mb-6">This is the core of your business. Here is the repeatable process for creating endless videos. Let's make your very first one: "What If The Titanic Never Sank?"</p>
                         
                         <!-- Accordions for Content Steps -->
                         <div class="space-y-4">
-                            <!-- Accordion Item 1: Scripting -->
+                            <!-- Accordion Item 2.1: Scripting -->
                             <div class="accordion-item bg-slate-50 rounded-lg shadow-md">
                                 <h2>
                                     <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-slate-700 hover:bg-slate-100 rounded-lg" data-target="#accordion-body-1">
-                                        <span>Step 1.1: Scripting Engaging Narratives</span>
+                                        <span>Step 2.1: Generate the Script (Using Gemini/ChatGPT)</span>
                                         <svg class="accordion-arrow w-6 h-6 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
                                 </h2>
@@ -167,25 +291,22 @@
                                             <li>Google Gemini (Free Tier)</li>
                                             <li>Microsoft Copilot</li>
                                         </ul>
-                                        <h4 class="font-semibold text-slate-800 mb-2">✨ Gemini-Powered Script Generator ✨</h4>
-                                        <p class="text-slate-600 mb-2">Enter your video topic below and let Gemini draft a compelling script for your YouTube Short:</p>
-                                        <textarea id="videoTopicInput" class="w-full p-3 border border-gray-300 rounded-md focus:ring-teal-500 focus:border-teal-500 mb-4" rows="3" placeholder="e.g., What If Dinosaurs Never Went Extinct?" oninput="autoResizeTextarea(this)"></textarea>
-                                        <button id="generateScriptButton" class="bg-teal-600 text-white px-6 py-2 rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 flex items-center justify-center">
-                                            Generate Script
-                                            <div id="scriptLoadingSpinner" class="spinner ml-2"></div>
-                                        </button>
-                                        <div id="generatedScriptOutput" class="mt-4 p-4 bg-slate-100 rounded-md border border-slate-200 text-slate-700 whitespace-pre-wrap hidden"></div>
+                                        <h4 class="font-semibold text-slate-800 mb-2">Script Prompt:</h4>
+                                        <p class="text-slate-600 mb-2">Use this prompt in your chosen AI writing tool to get started:</p>
+                                        <div class="bg-gray-100 p-3 rounded-md text-sm font-mono mb-4 border border-gray-200 whitespace-pre-wrap">
+                                            Act as a world-class history storyteller. You MUST ONLY output the script for a 60-second YouTube Short titled "What If The Titanic Never Sank?". The script must have a powerful hook, build dramatic tension, and reveal the shocking long-term consequences. Structure it in 5 scenes. End with a call-to-action to subscribe.
+                                        </div>
                                         <h4 class="font-semibold text-slate-800 mb-2 mt-6">Key to Success:</h4>
                                         <p class="text-slate-600">Raw AI output can be flagged by YouTube as "low-value, templated content." You MUST refine, fact-check, and rewrite sections to add your unique analysis. This human touch is non-negotiable for monetization.</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Accordion Item 2: Visuals -->
+                            <!-- Accordion Item 2.2: Visuals -->
                             <div class="accordion-item bg-slate-50 rounded-lg shadow-md">
                                 <h2>
                                     <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-slate-700 hover:bg-slate-100 rounded-lg" data-target="#accordion-body-2">
-                                        <span>Step 1.2: Visualizing History</span>
+                                        <span>Step 2.2: Generate the Visuals (Using Free AI Tools)</span>
                                         <svg class="accordion-arrow w-6 h-6 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
                                 </h2>
@@ -197,8 +318,8 @@
                                                 <thead class="text-xs text-slate-700 uppercase bg-slate-200">
                                                     <tr>
                                                         <th scope="col" class="px-6 py-3">Feature</th>
-                                                        <th scope="col" class="px-6 py-3">Leonardo AI (Free)</th>
-                                                        <th scope="col" class="px-6 py-3">Playground AI (Free)</th>
+                                                        <th scope="col" class="px-6 py-3">Leonardo AI (Free Tier)</th>
+                                                        <th scope="col" class="px-6 py-3">Playground AI (Free Tier)</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -208,33 +329,47 @@
                                                         <td class="px-6 py-4">Up to 1,000 images</td>
                                                     </tr>
                                                     <tr class="bg-white border-b">
-                                                        <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Commercial Rights</th>
-                                                        <td class="px-6 py-4">Non-exclusive license (they also hold rights)</td>
-                                                        <td class="px-6 py-4 font-bold text-teal-600">You own all commercial rights</td>
+                                                        <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Watermark on Free Output</th>
+                                                        <td class="px-6 py-4">No explicit mention of watermark on free images, but "Motion Images" are generated without watermarks in paid plans</td>
+                                                        <td class="px-6 py-4">Yes, images are watermarked</td>
                                                     </tr>
                                                     <tr class="bg-white border-b">
-                                                        <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Watermark</th>
-                                                        <td class="px-6 py-4">No</td>
-                                                        <td class="px-6 py-4">Yes</td>
+                                                        <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Commercial Use Rights (User Ownership)</th>
+                                                        <td class="px-6 py-4">Non-exclusive, royalty-free license granted; Leonardo AI "holds rights to use, reproduce, modify, and distribute any images you create"</td>
+                                                        <td class="px-6 py-4 font-bold text-teal-600">You own all commercial rights to every design you make, for free</td>
                                                     </tr>
                                                     <tr class="bg-white">
-                                                        <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Key Features</th>
-                                                        <td class="px-6 py-4">Motion/3D Images, Upscaler, Community Models</td>
-                                                        <td class="px-6 py-4">16:9 Aspect Ratio, Image Expansion, High Volume</td>
+                                                        <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Key Differentiating Features</th>
+                                                        <td class="px-6 py-4">Motion images, Realtime Canvas, 3D Generations, Universal Upscaler, Community Models, ControlNets (some premium)</td>
+                                                        <td class="px-6 py-4">Sketching, Image Expansion, Object/Background Removal, Collaborative Projects, Style Customization</td>
+                                                    </tr>
+                                                    <tr class="bg-white">
+                                                        <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">Supported Aspect Ratios</th>
+                                                        <td class="px-6 py-4">Not explicitly detailed for free tier, but image guidance allows for influence ratios</td>
+                                                        <td class="px-6 py-4">16:9, 1:1, 9:16</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </div>
                                         <p class="mt-4 text-sm text-slate-600"><strong>Recommendation:</strong> Use Playground AI for high-volume concept generation and backgrounds. Use Leonardo AI for key visuals where motion or upscaling is needed, but be aware of the shared commercial rights.</p>
+                                        <p class="mt-4 text-sm text-slate-600"><strong>Effective Prompt Engineering:</strong> Prompts should be detailed, specifying the historical period, setting, characters, mood, and desired art style (e.g., "photorealistic, 18th-century European battlefield, foggy, dramatic lighting, soldiers in red coats, 16:9 aspect ratio"). The use of negative prompts is also crucial to exclude unwanted elements (e.g., "modern technology, cars, anachronisms").</p>
+                                        <h4 class="font-semibold text-slate-800 mb-2 mt-6">Example Prompts for "What If The Titanic Never Sank?":</h4>
+                                        <ul class="list-disc list-inside text-slate-600 space-y-2 mb-4">
+                                            <li><code>the Titanic narrowly missing an iceberg at night, dramatic cinematic lighting, photorealistic, high detail --ar 9:16</code></li>
+                                            <li><code>the Titanic arriving in New York City harbor in 1912, cheering crowds on the docks, celebratory atmosphere, vintage photo style --ar 9:16</code></li>
+                                            <li><code>a fleet of massive, opulent ocean liners from the 1930s, looking even bigger than the Titanic, criss-crossing the Atlantic, art deco style --ar 9:16</code></li>
+                                            <li><code>a modern-day shipping lane completely clogged with icebergs, a huge cargo ship trying to navigate through, dangerous and tense atmosphere, cinematic --ar 9:16</code></li>
+                                            <li><code>a scientist pointing to a world map showing altered global shipping routes, text overlay saying "Global Trade Disrupted", futuristic data visualization --ar 9:16</code></li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- Accordion Item 3: Voiceover -->
+                            <!-- Accordion Item 2.3: Voiceover -->
                             <div class="accordion-item bg-slate-50 rounded-lg shadow-md">
                                 <h2>
                                     <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-slate-700 hover:bg-slate-100 rounded-lg" data-target="#accordion-body-3">
-                                        <span>Step 1.3: Creating the Voiceover</span>
+                                        <span>Step 2.3: Generate the Voiceover (Using CapCut)</span>
                                         <svg class="accordion-arrow w-6 h-6 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
                                 </h2>
@@ -243,34 +378,45 @@
                                         <p class="mb-4 text-slate-600">A clear, engaging voiceover is your connection to the audience. Robotic voices will kill your retention.</p>
                                         <h4 class="font-semibold text-slate-800 mb-2">Recommended Free Tool:</h4>
                                         <p class="text-slate-600 mb-4"><strong class="text-teal-600">CapCut (Web & Desktop):</strong> Offers a wide library of natural-sounding text-to-speech voices with a commercial license option. The free plan has daily limits (10-20 minutes), so plan your work in batches.</p>
-                                        <h4 class="font-semibold text-slate-800 mb-2">Pro Tip:</h4>
-                                        <p class="text-slate-600">To make the AI voice sound more natural, break long sentences into shorter ones and use punctuation (commas, periods) to guide the pacing and intonation.</p>
+                                        <h4 class="font-semibold text-slate-800 mb-2">Pro Tip for Natural Voiceovers:</h4>
+                                        <p class="text-slate-600">To make the AI voice sound more natural, break long sentences into shorter ones and use punctuation (commas, periods) to guide the pacing and intonation. Experiment with different voice styles and speeds offered within CapCut.</p>
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- Accordion Item 4: Editing -->
+                            <!-- Accordion Item 2.4: Editing -->
                             <div class="accordion-item bg-slate-50 rounded-lg shadow-md">
                                 <h2>
                                     <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-slate-700 hover:bg-slate-100 rounded-lg" data-target="#accordion-body-4">
-                                        <span>Step 1.4: Assembling the Video</span>
+                                        <span>Step 2.4: Assemble the Video (Using CapCut)</span>
                                         <svg class="accordion-arrow w-6 h-6 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
-                                </h2>
+                                <h2>
                                 <div id="accordion-body-4" class="accordion-content">
                                     <div class="p-5 border-t border-slate-200">
-                                        <p class="mb-4 text-slate-600">This is where you bring the script, visuals, and voiceover together into a polished final product.</p>
-                                        <h4 class="font-semibold text-slate-800 mb-2">Recommended Free Tool:</h4>
-                                        <p class="text-slate-600 mb-4"><strong class="text-teal-600">CapCut (Desktop):</strong> A surprisingly powerful and completely free video editor. It includes features often found only in paid software.</p>
-                                        <h4 class="font-semibold text-slate-800 mb-2">Key Free Features:</h4>
+                                        <p class="mb-4 text-slate-600">This is where you bring the script, visuals, and voiceover together into a polished final product. CapCut is a surprisingly powerful and completely free video editor.</p>
+                                        <h4 class="font-semibold text-slate-800 mb-2">Key Free Features in CapCut:</h4>
                                         <ul class="list-disc list-inside text-slate-600 space-y-1 mb-4">
-                                            <li>Multi-track timeline for easy layering.</li>
-                                            <li>Keyframe animation to add movement to static images.</li>
-                                            <li>Auto-captions to improve accessibility and SEO.</li>
-                                            <li>Royalty-free music & SFX library (<strong>Warning:</strong> Always double-check commercial use rights!).</li>
-                                            <li>4K export options for high-quality output.</li>
+                                            <li>**Video Editing:** Trim/Split/Merge, Speed Adjustment, Keyframe Animation, Smooth Slow-Motion (Optical Flow), Chroma Key, Stabilization, Multi-track Timeline</li>
+                                            <li>**Audio/Voiceover:** Text-to-Speech (Diverse voices, commercial license), Music Library (with copyright note), Sound Effects Library, Volume/Pitch Adjustment, Noise Reduction</li>
+                                            <li>**AI Tools:** Auto Captions (High accuracy, customization), Background Removal, AI Upscaler (Image/Video)</li>
+                                            <li>**Export Options:** Resolution (480p, 720p, 1080p, 2K, 4K), Frame Rate (24, 25, 30, 50, 60fps), Format (MP4, MOV)</li>
+                                            <li>**Asset Library:** Free Fonts, Effects, Filters, Transitions</li>
                                         </ul>
-                                        <p class="text-sm text-slate-500"><strong>Critical Note on Audio:</strong> To be 100% safe from copyright claims, use the official <strong class="text-slate-700">YouTube Audio Library</strong> for background music. It's guaranteed to be monetization-safe.</p>
+                                        <h4 class="font-semibold text-slate-800 mb-2">Workflow in CapCut:</h4>
+                                        <ul class="list-disc list-inside text-slate-600 space-y-2 mb-4">
+                                            <li><strong>Start a new project.</strong></li>
+                                            <li><strong>Upload Your Assets:</strong> Upload the voiceover MP3 and the images you generated.</li>
+                                            <li><strong>Match Scenes:</strong> Drag your generated images to align with your voiceover segments on the timeline.</li>
+                                            <li><strong>Add Your Voiceover:</strong> Place your generated voiceover track.</li>
+                                            <li><strong>Add Music & Captions:</strong>
+                                                <ul class="list-disc list-inside ml-4">
+                                                    <li>For background music, use the official <strong class="text-slate-700">YouTube Audio Library</strong>. It's guaranteed monetization-safe.</li>
+                                                    <li>Enable auto-captions from CapCut's "Text" tab for accessibility and SEO.</li>
+                                                </ul>
+                                            </li>
+                                            <li><strong>Generate & Download:</strong> Export your finished MP4 video file. For most YouTube content, 1080p (1920x1080) is recommended.</li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
@@ -279,18 +425,18 @@
                     </div>
                 </div>
 
-                <!-- Monetization Tab -->
+                <!-- Phase 3: Monetization Tab -->
                 <div id="monetization" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-lg shadow-sm">
-                        <h2 class="text-2xl font-bold mb-4 text-slate-900">Phase 2: Monetizing Your Channel for Passive Income</h2>
+                        <h2 class="text-2xl font-bold mb-4 text-slate-900">Phase 3: The Money Machine (Monetization)</h2>
                         <p class="text-slate-600 mb-6">Monetization is more than just ads. A diversified income strategy is key to building a resilient, passive income stream. Start these from day one.</p>
                         
                         <div class="space-y-4">
-                            <!-- Accordion Item 5: YPP -->
+                            <!-- Accordion Item 3.1: YPP -->
                              <div class="accordion-item bg-slate-50 rounded-lg shadow-md">
                                 <h2>
                                     <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-slate-700 hover:bg-slate-100 rounded-lg" data-target="#accordion-body-5">
-                                        <span>Step 2.1: YouTube Partner Program (AdSense)</span>
+                                        <span>Step 3.1: YouTube Partner Program (AdSense)</span>
                                         <svg class="accordion-arrow w-6 h-6 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
                                 </h2>
@@ -304,28 +450,34 @@
                                         </ul>
                                         <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
                                           <p class="font-bold">Monetization Warning</p>
-                                          <p>YouTube's biggest policy hurdle for AI channels is "repetitive or reused content." You must demonstrate significant human input (unique commentary, strong narrative, creative editing) to avoid demonetization.</p>
+                                          <p>YouTube's biggest policy hurdle for AI channels is "repetitive or reused content." You must demonstrate significant human input (unique commentary, strong narrative, creative editing) to avoid demonetization. This is why human editing of AI-generated content (Phase 2 steps) is crucial.</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- Accordion Item 6: Digital Products -->
+                            <!-- Accordion Item 3.2: Digital Products -->
                              <div class="accordion-item bg-slate-50 rounded-lg shadow-md">
                                 <h2>
                                     <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-slate-700 hover:bg-slate-100 rounded-lg" data-target="#accordion-body-6">
-                                        <span>Step 2.2: Selling Digital Products</span>
+                                        <span>Step 3.2: Selling Digital Products</span>
                                         <svg class="accordion-arrow w-6 h-6 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
                                 </h2>
                                 <div id="accordion-body-6" class="accordion-content">
                                     <div class="p-5 border-t border-slate-200">
                                         <p class="mb-4 text-slate-600">This is your most profitable long-term income stream. Create a product once and sell it forever. Repurpose your video scripts and research into ebooks or guides.</p>
-                                        <h4 class="font-semibold text-slate-800 mb-2">Free Tools for Product Creation & Sales:</h4>
-                                        <ul class="list-disc list-inside text-slate-600 space-y-2 mb-6">
-                                            <li><strong>Canva:</strong> Use free templates to design professional-looking PDFs for your ebooks and guides.</li>
-                                            <li><strong>Gumroad:</strong> A platform to sell your digital products. It's free to list products, but they take a fee from each sale.</li>
+                                        <h4 class="font-semibold text-slate-800 mb-2">Creating Ebooks and Guides:</h4>
+                                        <ul class="list-disc list-inside text-slate-600 space-y-2 mb-4">
+                                            <li><strong>Outline & Write:</strong> Use tools like ChatGPT/Gemini to outline topics and draft chapters.</li>
+                                            <li><strong>Design:</strong> Use <a href="https://www.canva.com/" target="_blank" class="text-teal-600 hover:underline">Canva (free tier)</a> to format text into professional-looking PDF eBooks and create compelling covers.</li>
                                         </ul>
+                                        <h4 class="font-semibold text-slate-800 mb-2">Selling with Gumroad:</h4>
+                                        <p class="text-slate-600 mb-4">
+                                            <a href="https://gumroad.com/" target="_blank" class="text-teal-600 hover:underline">Gumroad</a> is a platform to sell your digital products. It's free to list products, but they take a fee from each sale.
+                                            <br>
+                                            For example product: An eBook titled "Timelines of Ruin: 15 Historical Disasters and How They Could Have Been Avoided." Set the price at something accessible, like $15-$25.
+                                        </p>
                                         <h4 class="font-semibold text-slate-800 mb-2">Understanding Gumroad's "Free" Model</h4>
                                         <p class="text-slate-600 mb-4">Gumroad is free to start, but not free of cost. For every sale, they take a percentage. Here's a typical breakdown for a $100 sale:</p>
                                         <div class="chart-container">
@@ -335,42 +487,82 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Accordion Item 3.3: Integrating Monetization Into Your Video Description -->
+                            <div class="accordion-item bg-slate-50 rounded-lg shadow-md">
+                                <h2>
+                                    <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-slate-700 hover:bg-slate-100 rounded-lg" data-target="#accordion-body-6-3">
+                                        <span>Step 3.3: Integrating Monetization Into Your Video Description</span>
+                                        <svg class="accordion-arrow w-6 h-6 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                </h2>
+                                <div id="accordion-body-6-3" class="accordion-content">
+                                    <div class="p-5 border-t border-slate-200">
+                                        <p class="mb-4 text-slate-600">This is where you turn views into cash. Copy-paste this template for every video description, replacing placeholders with your actual links:</p>
+                                        <div class="bg-gray-100 p-3 rounded-md text-sm font-mono mb-4 border border-gray-200 whitespace-pre-wrap">
+                                            (Your video title)
+                                            What if the world you know was just one of many possibilities? In this video, we explore the shocking consequences if the Titanic had never sunk.
+                                            ----------------------------------------------------
+                                            📚 **MY PREMIUM EBOOK: "Timelines of Ruin"**
+                                            Dive deeper with my guide to 15 historical disasters and how one different choice could have changed everything.
+                                            ► Get it here: [Your Gumroad Link]
+                                            ----------------------------------------------------
+                                            📖 **THE WHAT IF? HISTORIAN'S LIBRARY**
+                                            Explore the books that inspire our episodes. Every purchase supports the channel at no extra cost to you!
+                                            ► A Night to Remember (The Titanic): [Your Amazon Affiliate Link]
+                                            ► See all my book recommendations: [Your Kit.co Link]
+                                            ----------------------------------------------------
+                                            The What If? Historian explores alternate history, historical what-ifs, and the fascinating butterfly effects that shape our world.
+                                            #whatif #history #alternatereality #titanic
+                                        </div>
+                                        <h4 class="font-semibold text-slate-800 mb-2">Step 3.4: Affiliate Marketing (The Easiest Income)</h4>
+                                        <p class="text-slate-600 mb-4">You earn a commission when someone buys a product through your unique link.</p>
+                                        <ul class="list-disc list-inside text-slate-600 space-y-2 mb-4">
+                                            <li>Sign up for <a href="https://affiliate-program.amazon.com/" target="_blank" class="text-teal-600 hover:underline">Amazon Associates</a>. It's free and easy.</li>
+                                            <li>**Find Relevant Products:** Search on Amazon for a best-selling, highly-rated book about your video topic.</li>
+                                            <li>**Get Your Link:** On the Amazon Associates dashboard, create your unique affiliate link for that product.</li>
+                                            <li>**Create a Kit.co Page:** This is a free and clean way to list all the books/products you recommend. Create a kit like "The What If? Historian Library" and add your product to it.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Growth Tab -->
-                <div id="growth" class="tab-content hidden space-y-6">
+                <!-- Phase 4: Launch & Growth Tab -->
+                <div id="growth-legal" class="tab-content hidden space-y-6">
                      <div class="bg-white p-6 rounded-lg shadow-sm">
-                        <h2 class="text-2xl font-bold mb-4 text-slate-900">Phase 3: Growth & Legal Guardrails</h2>
+                        <h2 class="text-2xl font-bold mb-4 text-slate-900">Phase 4: Launch & Growth (The First Month)</h2>
                         <p class="text-slate-600 mb-6">Building a sustainable channel requires consistent effort and a clear understanding of the rules of the road.</p>
                         
                         <div class="space-y-4">
-                            <!-- Accordion Item 7: Growth -->
-                             <div class="accordion-item bg-slate-500 rounded-lg shadow-md">
+                            <!-- Accordion Item 4.1: Launch Strategy -->
+                             <div class="accordion-item bg-slate-50 rounded-lg shadow-md">
                                 <h2>
                                     <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-slate-700 hover:bg-slate-100 rounded-lg" data-target="#accordion-body-7">
-                                        <span>Step 3.1: Growth Strategies</span>
+                                        <span>Step 4.1: Launch Strategy</span>
                                         <svg class="accordion-arrow w-6 h-6 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
                                 </h2>
                                 <div id="accordion-body-7" class="accordion-content">
                                     <div class="p-5 border-t border-slate-200">
-                                        <h4 class="font-semibold text-slate-800 mb-2">Consistency is Key:</h4>
-                                        <p class="text-slate-600 mb-4">Regular uploads signal to the YouTube algorithm that your channel is active. Aim for a consistent schedule, even if it's just one video a week to start.</p>
-                                         <h4 class="font-semibold text-slate-800 mb-2">Batch Your Workflow:</h4>
-                                        <p class="text-slate-600 mb-4">Don't create one video at a time. Dedicate a block of time to create all your content for the week—write all scripts, then generate all images, then record all voiceovers. This is far more efficient.</p>
-                                         <h4 class="font-semibold text-slate-800 mb-2">Engage with Your Community:</h4>
-                                        <p class="text-slate-600">Reply to comments, ask questions in your videos, and build a community around your topic. This increases viewer loyalty and watch time.</p>
+                                        <p class="mb-4 text-slate-600"><strong>Upload Your First Video:</strong> Upload the "Titanic" video you created in Phase 2. Fill in the title and the description template (from Step 3.3). Add relevant tags like `what if`, `history`, `alternate history`, `titanic story`.</p>
+                                        <h4 class="font-semibold text-slate-800 mb-2">Create a Content Schedule:</h4>
+                                        <p class="text-slate-600 mb-4">Your goal is to post 3-5 Shorts per week.</p>
+                                         <h4 class="font-semibold text-slate-800 mb-2">Batch Create:</h4>
+                                        <p class="text-slate-600 mb-4">Don't make one video at a time. Dedicate one block of time (e.g., 3 hours on a Sunday) to create ALL your videos for the week. Follow the workflow in Phase 2.</p>
+                                         <h4 class="font-semibold text-slate-800 mb-2">Engage:</h4>
+                                        <p class="text-slate-600">In the first few hours after posting, respond to every comment. This boosts your video in the algorithm.</p>
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- Accordion Item 8: Legal -->
+                            <!-- Accordion Item 4.2: Legal & Ethical Considerations -->
                              <div class="accordion-item bg-slate-50 rounded-lg shadow-md">
                                 <h2>
                                     <button type="button" class="accordion-button flex items-center justify-between w-full p-5 font-medium text-left text-slate-700 hover:bg-slate-100 rounded-lg" data-target="#accordion-body-8">
-                                        <span>Step 3.2: Legal & Ethical Considerations</span>
+                                        <span>Step 4.2: Legal & Ethical Considerations</span>
                                         <svg class="accordion-arrow w-6 h-6 shrink-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
                                 <h2>
@@ -411,6 +603,36 @@
             const exploreButton = document.getElementById('exploreButton');
             const mainContent = document.getElementById('mainContent');
             const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+            const factDisplay = document.getElementById('factDisplay');
+
+            const whatIfFacts = [
+                "What if the Roman Empire never fell? Would we be speaking Latin today?",
+                "What if dinosaurs never went extinct? Would humans coexist with them, or be prey?",
+                "What if the library of Alexandria was never destroyed? How much knowledge was lost?",
+                "What if the Black Death never happened? How would Europe's society have evolved?",
+                "What if America lost the Revolutionary War? Would we still be under British rule?",
+                "What if the Internet was never invented? How would our lives be different?",
+                "What if World War II never happened? What would the 20th century look like?",
+                "What if Cleopatra's asp missed? Would Egypt have remained independent?",
+                "What if the meteor that killed the dinosaurs had landed in the ocean?",
+                "What if humanity never developed agriculture? Would we still be nomads?",
+                "What if the Space Race never occurred? How would technology be different today?",
+                "What if the Ming Dynasty continued its naval explorations? Would China have colonized the world?",
+                "What if Napoleon had won the Battle of Waterloo? How would Europe be shaped?",
+                "What if the potato blight never occurred? Would Ireland's population be vastly larger?",
+                "What if penicillin was discovered 100 years earlier? How many lives would have been saved?",
+            ];
+            let currentFactIndex = 0;
+
+            function displayNextFact() {
+                factDisplay.textContent = whatIfFacts[currentFactIndex];
+                factDisplay.classList.remove('hidden'); // Ensure it's visible
+                currentFactIndex = (currentFactIndex + 1) % whatIfFacts.length;
+            }
+
+            // Initial display and then cycle
+            displayNextFact();
+            setInterval(displayNextFact, 10000); // Change fact every 10 seconds
 
             // Header fade-in animation
             setTimeout(() => {
@@ -445,6 +667,12 @@
 
             // Accordion functionality
             const accordions = document.querySelectorAll('.accordion-button');
+            // Open the first accordion item by default on page load
+            const firstAccordionButton = document.querySelector('#accordion-body-setup-1').previousElementSibling;
+            if (firstAccordionButton) {
+                firstAccordionButton.click(); // Simulate a click to open it
+            }
+
             accordions.forEach(accordion => {
                 accordion.addEventListener('click', () => {
                     const target = document.querySelector(accordion.dataset.target);
@@ -454,8 +682,16 @@
                         target.style.maxHeight = null;
                         accordion.classList.remove('open');
                     } else {
+                        // Close other open accordions before opening the new one (optional UX)
+                        // document.querySelectorAll('.accordion-content.open').forEach(openContent => {
+                        //     openContent.style.maxHeight = null;
+                        //     openContent.previousElementSibling.classList.remove('open');
+                        // });
+                        
                         target.style.maxHeight = target.scrollHeight + 'px';
                         accordion.classList.add('open');
+                        // Scroll accordion into view if it's off-screen
+                        accordion.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }
                 });
             });
@@ -539,61 +775,6 @@
                     }
                 });
             }
-
-            // Gemini API Integration - Script Generator
-            const videoTopicInput = document.getElementById('videoTopicInput');
-            const generateScriptButton = document.getElementById('generateScriptButton');
-            const scriptLoadingSpinner = document.getElementById('scriptLoadingSpinner');
-            const generatedScriptOutput = document.getElementById('generatedScriptOutput');
-
-            generateScriptButton.addEventListener('click', async () => {
-                const topic = videoTopicInput.value.trim();
-                if (!topic) {
-                    generatedScriptOutput.textContent = 'Please enter a video topic.';
-                    generatedScriptOutput.classList.remove('hidden');
-                    return;
-                }
-
-                generateScriptButton.disabled = true;
-                scriptLoadingSpinner.style.display = 'inline-block';
-                generatedScriptOutput.classList.add('hidden');
-                generatedScriptOutput.textContent = '';
-
-                try {
-                    let chatHistory = [];
-                    const prompt = `Act as a world-class history storyteller. You MUST ONLY output the script for the YouTube Short, with no introductory or concluding conversational text. Write a script for a 60-second YouTube Short titled "${topic}". The script must have a powerful hook, build dramatic tension, and reveal the shocking long-term consequences. Structure it in 5 scenes. End with a call-to-action to subscribe.`;
-                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                    const payload = { contents: chatHistory };
-                    const apiKey = "";
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    const result = await response.json();
-
-                    if (result.candidates && result.candidates.length > 0 &&
-                        result.candidates[0].content && result.candidates[0].content.parts &&
-                        result.candidates[0].content.parts.length > 0) {
-                        const text = result.candidates[0].content.parts[0].text;
-                        generatedScriptOutput.textContent = text;
-                        generatedScriptOutput.classList.remove('hidden');
-                    } else {
-                        generatedScriptOutput.textContent = 'Error: Could not generate script. Please try again or refine your topic.';
-                        generatedScriptOutput.classList.remove('hidden');
-                    }
-                } catch (error) {
-                    console.error('Error generating script:', error);
-                    generatedScriptOutput.textContent = 'An error occurred while generating the script. Please check your network connection and try again.';
-                    generatedScriptOutput.classList.remove('hidden');
-                } finally {
-                    generateScriptButton.disabled = false;
-                    scriptLoadingSpinner.style.display = 'none';
-                }
-            });
 
             // Auto-resize textarea function (for input)
             window.autoResizeTextarea = (textarea) => {
